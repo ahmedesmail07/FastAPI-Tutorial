@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from typing import (
     Optional,
 )  # Don't forget to import it for making sure optional works at sort parameter
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -40,3 +41,16 @@ def show(id: int):  # returns only integer value in the url path
 @app.get("/blog/{id}/comments")
 def comments(id: int):
     return {"Data": {"Comments Is Here For ID ": id}}
+
+
+class Blog(BaseModel):
+    title: str
+    body: str
+    published_at: Optional[bool]
+
+
+@app.post("/blog")
+def CreateBlog(
+    request: Blog,
+):  # Requset Body is called request or some thing else and it's type is Blog which extends from BaseModel
+    return {f"This Blog Has Been Added by {request.title}"}
