@@ -1,11 +1,23 @@
 from fastapi import FastAPI
+from typing import (
+    Optional,
+)  # Don't forget to import it for making sure optional works at sort parameter
 
 app = FastAPI()
 
 
-@app.get("/")
-async def root():
-    return {"Message": "Welcome To Fast Api"}
+@app.get("/blog")
+def index(  # in this case it is REQUIRED VALUES note that okay ?
+    limit, published, sort: Optional[str] = None
+):  # if u set published = bool in the query it will be returned as a boolean value not string
+    if published:
+        return {"data": f"{limit} from blog DB"}
+    else:
+        return {"data": f"{limit} from blog DB if unpublished "}
+
+
+# this published value will be return this values if we set the published parameter== true
+# in the route(PATH) of the url >> localhost:8000/blogs/published=true
 
 
 @app.get("/blog/{id}")
