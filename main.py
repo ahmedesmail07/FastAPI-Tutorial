@@ -3,6 +3,7 @@ from typing import (
     Optional,
 )  # Don't forget to import it for making sure optional works at sort parameter
 from pydantic import BaseModel
+import uvicorn
 
 app = FastAPI()
 
@@ -54,3 +55,8 @@ def CreateBlog(
     request: Blog,
 ):  # Requset Body is called request or some thing else and it's type is Blog which extends from BaseModel
     return {f"This Blog Has Been Added by {request.title}"}
+
+
+# if __name__ == "__main__":
+#     uvicorn.run(app, host="127.0.0.1", port=9000)
+# this will u run only the app if it's name = main && the app will be run at 127.0.0.1:9000
