@@ -60,3 +60,4 @@ def CreateBlog(
 # if __name__ == "__main__":
 #     uvicorn.run(app, host="127.0.0.1", port=9000)
 # this will u run only the app if it's name = main && the app will be run at 127.0.0.1:9000
+# u can select the break points using the cursor in the end of the part u need to end at and then debug ur app 
