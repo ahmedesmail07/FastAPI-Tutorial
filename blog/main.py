@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, status, Response, HTTPException
 from . import schemas, models  # dot is meaning import from the current dir
 from .database import engine, SessionLocal
 from sqlalchemy.orm import Session
@@ -22,7 +22,7 @@ def get_db():
         db.close()
 
 
-@app.post("/blog")
+@app.post("/blog", status_code=status.HTTP_201_CREATED)
 def CreatePost(request: schemas.Blog, db: Session = Depends(get_db)):
     new_blog = models.Blog(
         title=request.title,
@@ -32,3 +32,22 @@ def CreatePost(request: schemas.Blog, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_blog)
     return new_blog
+
+
+@app.get("/blog")
+def GetBlogs(db: Session = Depends(get_db)):
+    blogs = db.query(models.Blog).all()
+    return blogs
+
+
+# Getting All Blogs FROM DB
+
+
+@app.get("/blog/{id}", status_code=200)  # the default returned val== 200 (OK)
+def GetParticularBlog(id, response: Response, db: Session = Depends(get_db)):
+    blog = db.query(models.Blog).filter(models.Blog.id == id).first()
+    if not blog:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        # response.status_code = status.HTTP_404_NOT_FOUND
+        # return {f"Blog with the id of {id} in not created yet"}
+    return blog
