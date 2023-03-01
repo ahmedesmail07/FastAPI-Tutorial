@@ -51,3 +51,33 @@ def GetParticularBlog(id, response: Response, db: Session = Depends(get_db)):
         # response.status_code = status.HTTP_404_NOT_FOUND
         # return {f"Blog with the id of {id} in not created yet"}
     return blog
+
+
+@app.delete("/blog/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def DeleteParticularBlog(id, response: Response, db: Session = Depends(get_db)):
+    blog = db.query(models.Blog).filter(models.Blog.id == id)
+    if not blog.first():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="There is no blog with this id num",
+        )
+    blog.delete(synchronize_session=False)
+
+    db.commit()  # Don't forget it to save the changes of the DELETION
+    raise HTTPException(
+        status_code=status.HTTP_200_OK, detail="This Blog Has Been Deleted Succesfully"
+    )
+
+
+@app.put("/blog/{id}", status_code=status.HTTP_202_ACCEPTED)
+def UpdateParticularBlog(id, request: schemas.Blog, db: Session = Depends(get_db)):
+    blog = db.query(models.Blog).filter(models.Blog.id == id)
+    if not blog.first():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="There is no blog with this id num",
+        )
+    blog.update(request.dict())
+    # Update Fields REQUIRED // when u put request parameter it will update all parts
+    db.commit()
+    return "UPDATED SUCCESFULLY"
