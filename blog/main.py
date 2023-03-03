@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, status, Response, HTTPException
 from . import schemas, models  # dot is meaning import from the current dir
 from .database import engine, SessionLocal
 from sqlalchemy.orm import Session
+from typing import List
 
 models.Base.metadata.create_all(engine)
 
@@ -34,7 +35,9 @@ def CreatePost(request: schemas.Blog, db: Session = Depends(get_db)):
     return new_blog
 
 
-@app.get("/blog")
+@app.get(
+    "/blog", response_model=List[schemas.ShowBlog]
+)  # Cause of u returns alist of blogs not only one
 def GetBlogs(db: Session = Depends(get_db)):
     blogs = db.query(models.Blog).all()
     return blogs
@@ -43,7 +46,9 @@ def GetBlogs(db: Session = Depends(get_db)):
 # Getting All Blogs FROM DB
 
 
-@app.get("/blog/{id}", status_code=200)  # the default returned val== 200 (OK)
+@app.get(
+    "/blog/{id}", status_code=200, response_model=schemas.ShowBlog
+)  # the default returned val== 200 (OK)
 def GetParticularBlog(id, response: Response, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
     if not blog:
@@ -69,7 +74,7 @@ def DeleteParticularBlog(id, response: Response, db: Session = Depends(get_db)):
     )
 
 
-@app.put("/blog/{id}", status_code=status.HTTP_202_ACCEPTED)
+@app.patch("/blog/{id}", status_code=status.HTTP_202_ACCEPTED)
 def UpdateParticularBlog(id, request: schemas.Blog, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id)
     if not blog.first():
@@ -81,3 +86,6 @@ def UpdateParticularBlog(id, request: schemas.Blog, db: Session = Depends(get_db
     # Update Fields REQUIRED // when u put request parameter it will update all parts
     db.commit()
     return "UPDATED SUCCESFULLY"
+
+
+# Note that @app.patch is equal to app.put
