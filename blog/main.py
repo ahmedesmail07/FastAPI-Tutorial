@@ -27,7 +27,7 @@ def get_db():
         db.close()
 
 
-@app.post("/blog", status_code=status.HTTP_201_CREATED)
+@app.post("/blog", status_code=status.HTTP_201_CREATED, tags=["Blog"])
 def CreatePost(request: schemas.Blog, db: Session = Depends(get_db)):
     new_blog = models.Blog(
         title=request.title,
@@ -40,7 +40,7 @@ def CreatePost(request: schemas.Blog, db: Session = Depends(get_db)):
 
 
 @app.get(
-    "/blog", response_model=List[schemas.ShowBlog]
+    "/blog", response_model=List[schemas.ShowBlog], tags=["Blog"]
 )  # Cause of u returns alist of blogs not only one
 def GetBlogs(db: Session = Depends(get_db)):
     blogs = db.query(models.Blog).all()
@@ -51,7 +51,7 @@ def GetBlogs(db: Session = Depends(get_db)):
 
 
 @app.get(
-    "/blog/{id}", status_code=200, response_model=schemas.ShowBlog
+    "/blog/{id}", status_code=200, response_model=schemas.ShowBlog, tags=["Blog"]
 )  # the default returned val== 200 (OK)
 def GetParticularBlog(id, response: Response, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
@@ -62,7 +62,7 @@ def GetParticularBlog(id, response: Response, db: Session = Depends(get_db)):
     return blog
 
 
-@app.delete("/blog/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/blog/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Blog"])
 def DeleteParticularBlog(id, response: Response, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id)
     if not blog.first():
@@ -78,7 +78,7 @@ def DeleteParticularBlog(id, response: Response, db: Session = Depends(get_db)):
     )
 
 
-@app.patch("/blog/{id}", status_code=status.HTTP_202_ACCEPTED)
+@app.patch("/blog/{id}", status_code=status.HTTP_202_ACCEPTED, tags=["User"])
 def UpdateParticularBlog(id, request: schemas.Blog, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id)
     if not blog.first():
@@ -95,7 +95,7 @@ def UpdateParticularBlog(id, request: schemas.Blog, db: Session = Depends(get_db
 # Note that @app.patch is equal to app.put
 
 
-@app.post("/user", response_model=schemas.ShowUser)
+@app.post("/user", response_model=schemas.ShowUser, tags=["Blog"])
 def CreateUser(request: schemas.UserCreate, db: Session = Depends(get_db)):
     new_user = models.UserCreate(
         name=request.name,
@@ -108,7 +108,7 @@ def CreateUser(request: schemas.UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 
-@app.get("/user/{id}", response_model=schemas.ShowUser)
+@app.get("/user/{id}", response_model=schemas.ShowUser, tags=["User"])
 def GetUser(id: int, db: Session = Depends(get_db)):
     user = db.query(models.UserCreate).filter(models.UserCreate.id == id).first()
     if not user:
