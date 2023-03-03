@@ -3,7 +3,8 @@ from fastapi import FastAPI, Depends, status, Response, HTTPException
 from sqlalchemy.orm import Session
 from . import schemas, models  # dot is meaning import from the current dir
 from .database import engine, SessionLocal
-
+from passlib.context import CryptContext
+from .hashing import Hash
 
 models.Base.metadata.create_all(
     bind=engine
@@ -97,7 +98,9 @@ def UpdateParticularBlog(id, request: schemas.Blog, db: Session = Depends(get_db
 @app.post("/user")
 def CreateUser(request: schemas.UserCreate, db: Session = Depends(get_db)):
     new_user = models.UserCreate(
-        name=request.name, email=request.email, password=request.password
+        name=request.name,
+        email=request.email,
+        password=Hash.bcrypt(request.password),
     )
     db.add(new_user)
     db.commit()
