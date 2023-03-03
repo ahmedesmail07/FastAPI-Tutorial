@@ -95,7 +95,7 @@ def UpdateParticularBlog(id, request: schemas.Blog, db: Session = Depends(get_db
 # Note that @app.patch is equal to app.put
 
 
-@app.post("/user")
+@app.post("/user", response_model=schemas.ShowUser)
 def CreateUser(request: schemas.UserCreate, db: Session = Depends(get_db)):
     new_user = models.UserCreate(
         name=request.name,
@@ -106,3 +106,14 @@ def CreateUser(request: schemas.UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     return new_user
+
+
+@app.get("/user/{id}", response_model=schemas.ShowUser)
+def GetUser(id: int, db: Session = Depends(get_db)):
+    user = db.query(models.UserCreate).filter(models.UserCreate.id == id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="There is no blog with this id num",
+        )
+    return user
