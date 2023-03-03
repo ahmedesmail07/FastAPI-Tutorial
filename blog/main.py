@@ -1,10 +1,13 @@
+from typing import List
 from fastapi import FastAPI, Depends, status, Response, HTTPException
+from sqlalchemy.orm import Session
 from . import schemas, models  # dot is meaning import from the current dir
 from .database import engine, SessionLocal
-from sqlalchemy.orm import Session
-from typing import List
 
-models.Base.metadata.create_all(engine)
+
+models.Base.metadata.create_all(
+    bind=engine
+)  # if u find any model let us create it into db
 
 # when u use schemas then when u extends a class from it
 # u should first type schemas.className then it will be working
@@ -89,3 +92,14 @@ def UpdateParticularBlog(id, request: schemas.Blog, db: Session = Depends(get_db
 
 
 # Note that @app.patch is equal to app.put
+
+
+@app.post("/user")
+def CreateUser(request: schemas.UserCreate, db: Session = Depends(get_db)):
+    new_user = models.UserCreate(
+        name=request.name, email=request.email, password=request.password
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
