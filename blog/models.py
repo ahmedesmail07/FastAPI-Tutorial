@@ -22,7 +22,6 @@ class UserCreate(Base):
     email = Column(String)
     password = Column(String)
     blogs = relationship("Blog", back_populates="creator")
-    #
 
 
 # when you create a blog or when you get the users it is known that the creator of

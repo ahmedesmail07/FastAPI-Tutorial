@@ -17,3 +17,11 @@ Base = declarative_base()
 
 # You can learn more about it from the docs of fast api
 # https://fastapi.tiangolo.com/tutorial/sql-databases/
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
