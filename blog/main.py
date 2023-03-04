@@ -28,11 +28,8 @@ def get_db():
 
 
 @app.post("/blog", status_code=status.HTTP_201_CREATED, tags=["Blog"])
-def CreatePost(request: schemas.Blog, db: Session = Depends(get_db)):
-    new_blog = models.Blog(
-        title=request.title,
-        body=request.body,
-    )
+def CreateBlog(request: schemas.Blog, db: Session = Depends(get_db)):
+    new_blog = models.Blog(title=request.title, body=request.body, user_id=1)
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)
@@ -78,7 +75,7 @@ def DeleteParticularBlog(id, response: Response, db: Session = Depends(get_db)):
     )
 
 
-@app.patch("/blog/{id}", status_code=status.HTTP_202_ACCEPTED, tags=["User"])
+@app.patch("/blog/{id}", status_code=status.HTTP_202_ACCEPTED, tags=["Blog"])
 def UpdateParticularBlog(id, request: schemas.Blog, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id)
     if not blog.first():
@@ -95,7 +92,7 @@ def UpdateParticularBlog(id, request: schemas.Blog, db: Session = Depends(get_db
 # Note that @app.patch is equal to app.put
 
 
-@app.post("/user", response_model=schemas.ShowUser, tags=["Blog"])
+@app.post("/user", response_model=schemas.ShowUser, tags=["User"])
 def CreateUser(request: schemas.UserCreate, db: Session = Depends(get_db)):
     new_user = models.UserCreate(
         name=request.name,

@@ -1,5 +1,6 @@
 from .database import Base
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 
 
 class Blog(Base):
@@ -9,6 +10,8 @@ class Blog(Base):
         String,
     )
     body = Column(String)
+    user_id = Column(Integer, ForeignKey("UserCreate.id"))
+    creator = relationship("UserCreate", back_populates="blogs")
 
 
 class UserCreate(Base):
@@ -18,3 +21,11 @@ class UserCreate(Base):
     name = Column(String)
     email = Column(String)
     password = Column(String)
+    blogs = relationship("Blog", back_populates="creator")
+    #
+
+
+# when you create a blog or when you get the users it is known that the creator of
+# the blog must be a user and also if u need to get the user u should be able to
+# see the blogs which is created by himself so it is clearly that we need to use
+# relation ship between the blog & the user so how to do this ? let's go
