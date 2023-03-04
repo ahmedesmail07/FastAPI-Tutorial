@@ -3,11 +3,11 @@ from .. import schemas, database, models
 from sqlalchemy.orm import Session
 from typing import List
 
-router = APIRouter()
+router = APIRouter(tags=["Blog"], prefix="/blog")
 
 
 @router.get(
-    "/blog", response_model=List[schemas.ShowBlog], tags=["Blog"]
+    "/", response_model=List[schemas.ShowBlog]
 )  # Cause of u returns alist of blogs not only one
 def GetBlogs(db: Session = Depends(database.get_db)):
     blogs = db.query(models.Blog).all()
@@ -18,7 +18,7 @@ def GetBlogs(db: Session = Depends(database.get_db)):
 
 
 @router.get(
-    "/blog/{id}", status_code=200, response_model=schemas.ShowBlog, tags=["Blog"]
+    "/{id}", status_code=200, response_model=schemas.ShowBlog
 )  # the default returned val== 200 (OK)
 def GetParticularBlog(id, response: Response, db: Session = Depends(database.get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
@@ -29,7 +29,7 @@ def GetParticularBlog(id, response: Response, db: Session = Depends(database.get
     return blog
 
 
-@router.delete("/blog/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Blog"])
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def DeleteParticularBlog(
     id, response: Response, db: Session = Depends(database.get_db)
 ):
@@ -47,7 +47,7 @@ def DeleteParticularBlog(
     )
 
 
-@router.patch("/blog/{id}", status_code=status.HTTP_202_ACCEPTED, tags=["Blog"])
+@router.patch("/{id}", status_code=status.HTTP_202_ACCEPTED)
 def UpdateParticularBlog(
     id, request: schemas.Blog, db: Session = Depends(database.get_db)
 ):
@@ -66,7 +66,7 @@ def UpdateParticularBlog(
 # Note that @app.patch is equal to app.put
 
 
-@router.post("/blog", status_code=status.HTTP_201_CREATED, tags=["Blog"])
+@router.post("/", status_code=status.HTTP_201_CREATED)
 def CreateBlog(request: schemas.Blog, db: Session = Depends(database.get_db)):
     new_blog = models.Blog(title=request.title, body=request.body, user_id=1)
     db.add(new_blog)

@@ -4,10 +4,10 @@ from sqlalchemy.orm import Session
 from typing import List
 from ..hashing import Hash
 
-router = APIRouter()
+router = APIRouter(prefix="/user",tags=["User"])
 
 
-@router.post("/user", response_model=schemas.ShowUser, tags=["User"])
+@router.post("/", response_model=schemas.ShowUser )
 def CreateUser(request: schemas.UserCreate, db: Session = Depends(database.get_db)):
     new_user = models.UserCreate(
         name=request.name,
@@ -20,7 +20,7 @@ def CreateUser(request: schemas.UserCreate, db: Session = Depends(database.get_d
     return new_user
 
 
-@router.get("/user/{id}", response_model=schemas.ShowUser, tags=["User"])
+@router.get("/{id}", response_model=schemas.ShowUser)
 def GetUser(id: int, db: Session = Depends(database.get_db)):
     user = db.query(models.UserCreate).filter(models.UserCreate.id == id).first()
     if not user:

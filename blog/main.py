@@ -1,10 +1,6 @@
-from typing import List
-from fastapi import FastAPI, Depends, status, Response, HTTPException
-from sqlalchemy.orm import Session
-from . import schemas, models  # dot is meaning import from the current dir
-from .database import engine, SessionLocal, get_db
-from passlib.context import CryptContext
-from .hashing import Hash
+from fastapi import FastAPI
+from . import models  # dot is meaning import from the current dir
+from .database import engine
 from .routers import blog, user
 
 models.Base.metadata.create_all(
