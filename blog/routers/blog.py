@@ -3,7 +3,8 @@ from .. import schemas, database, models
 from sqlalchemy.orm import Session
 from typing import List
 from ..repo import blog
-
+from .. import oauth2
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 router = APIRouter(tags=["Blog"], prefix="/blog")
 get_db = database.get_db
@@ -12,7 +13,10 @@ get_db = database.get_db
 @router.get(
     "/", response_model=List[schemas.ShowBlog]
 )  # Cause of u returns alist of blogs not only one
-def GetBlogs(db: Session = Depends(database.get_db)):
+def GetBlogs(
+    db: Session = Depends(database.get_db),
+    current_user: schemas.UserCreate = Depends(oauth2.get_current_user),
+):
     return blog.GetAllBlogs(db)
 
 
@@ -22,20 +26,31 @@ def GetBlogs(db: Session = Depends(database.get_db)):
 @router.get(
     "/{id}", status_code=200, response_model=schemas.ShowBlog
 )  # the default returned val== 200 (OK)
-def GetParticularBlog(id, response: Response, db: Session = Depends(database.get_db)):
+def GetParticularBlog(
+    id,
+    response: Response,
+    db: Session = Depends(database.get_db),
+    current_user: schemas.UserCreate = Depends(oauth2.get_current_user),
+):
     return blog.ShowParticularBlog(id, db)
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def DeleteParticularBlog(
-    id, response: Response, db: Session = Depends(database.get_db)
+    id,
+    response: Response,
+    db: Session = Depends(database.get_db),
+    current_user: schemas.UserCreate = Depends(oauth2.get_current_user),
 ):
     return blog.DeleteBlog(id, db)
 
 
 @router.patch("/{id}", status_code=status.HTTP_202_ACCEPTED)
 def UpdateParticularBlog(
-    id, request: schemas.Blog, db: Session = Depends(database.get_db)
+    id,
+    request: schemas.Blog,
+    db: Session = Depends(database.get_db),
+    current_user: schemas.UserCreate = Depends(oauth2.get_current_user),
 ):
     return blog.UpdateBlog(id, request, db)
 
@@ -44,5 +59,9 @@ def UpdateParticularBlog(
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def CreateBlog(request: schemas.Blog, db: Session = Depends(database.get_db)):
+def CreateBlog(
+    request: schemas.Blog,
+    db: Session = Depends(database.get_db),
+    current_user: schemas.UserCreate = Depends(oauth2.get_current_user),
+):
     return blog.CreateBlog(request, db)

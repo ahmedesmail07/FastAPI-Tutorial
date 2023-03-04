@@ -4,13 +4,17 @@ from .. import schemas, database, models
 from sqlalchemy.orm import Session
 from ..hashing import Hash
 from .. import token
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 
 router = APIRouter(tags=["Auth"])
 
 
 @router.post("/login")
-def login(request: schemas.Login, db: Session = Depends(database.get_db)):
+def login(
+    request: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(database.get_db),
+):
     user = (
         db.query(models.UserCreate)
         .filter(models.UserCreate.email == request.username)
