@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from . import models  # dot is meaning import from the current dir
 from .database import engine
-from .routers import blog, user
+from .routers import blog, user, auth
 
 models.Base.metadata.create_all(
     bind=engine
@@ -15,6 +15,7 @@ app = FastAPI()
 
 app.include_router(blog.router)
 app.include_router(user.router)
+app.include_router(auth.router)
 
 # u can use this inner app using uvicon after installation of req.txt by using commang:
 # uvicorn blog.main:app --reload
