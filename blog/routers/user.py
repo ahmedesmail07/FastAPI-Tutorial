@@ -3,29 +3,16 @@ from .. import schemas, database, models
 from sqlalchemy.orm import Session
 from typing import List
 from ..hashing import Hash
+from ..repo import blog, user
 
-router = APIRouter(prefix="/user",tags=["User"])
+router = APIRouter(prefix="/user", tags=["User"])
 
 
-@router.post("/", response_model=schemas.ShowUser )
+@router.post("/", response_model=schemas.ShowUser)
 def CreateUser(request: schemas.UserCreate, db: Session = Depends(database.get_db)):
-    new_user = models.UserCreate(
-        name=request.name,
-        email=request.email,
-        password=Hash.bcrypt(request.password),
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
+    return user.CreateNewUser(request, db)
 
 
 @router.get("/{id}", response_model=schemas.ShowUser)
 def GetUser(id: int, db: Session = Depends(database.get_db)):
-    user = db.query(models.UserCreate).filter(models.UserCreate.id == id).first()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="There is no blog with this id num",
-        )
-    return user
+    return user.ShowUser(id, db)
