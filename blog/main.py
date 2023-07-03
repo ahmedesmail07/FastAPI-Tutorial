@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from . import models  # dot is meaning import from the current dir
 from .database import engine
 from .routers import blog, user, auth
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
 models.Base.metadata.create_all(
     bind=engine
@@ -12,6 +14,15 @@ models.Base.metadata.create_all(
 
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+app.add_middleware(GZipMiddleware)
+
 
 app.include_router(blog.router)
 app.include_router(user.router)
